@@ -1,27 +1,59 @@
 import os
 import copy
+global END
+global WATER
+global SHIP
+global HIT
+global MISS
+global ship
+global hit
+global miss
+global water
 columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 rows = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+END="\033[1;m"
+WATER="\33[1;34;46m"
+SHIP="\33[1;30;47m"
+HIT="\33[1;31;47m"
+MISS="\33[1;31;46m"
+#water=[WATER,' ~ ',END]
+water=WATER+' ~ ' + END
+ship=SHIP+' O ' + END
+print(ship)
+hit=HIT+' X '+ END
+miss=MISS+' * '+ END
 base_matrix = [
-    ['\ ', ' A ', ' B ', ' C ', ' D ', ' E ',' F ', ' G ', ' H ', ' I ', ' J '],
-    ['1 ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ',' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ '],
-    ['2 ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ',' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ '],
-    ['3 ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ',' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ '],
-    ['4 ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ',' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ '],
-    ['5 ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ',' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ '],
-    ['6 ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ',' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ '],
-    ['7 ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ',' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ '],
-    ['8 ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ',' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ '],
-    ['9 ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ',' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ '],
-    ['10', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ', ' ~ ']
+    ['\ ', ' A ', ' B ', ' C ', ' D ', ' E ', ' F ', ' G ', ' H ', ' I ', ' J '],
+    ['1 ', water, water, water, water, water, water, water, water, water, water],
+    ['2 ', water, water, water, water, water, water, water, water, water, water],
+    ['3 ', water, water, water, water, water, water, water, water, water, water],
+    ['4 ', water, water, water, water, water, water, water, water, water, water],
+    ['5 ', water, water, water, water, water, water, water, water, water, water],
+    ['6 ', water, water, water, water, water, water, water, water, water, water],
+    ['7 ', water, water, water, water, water, water, water, water, water, water],
+    ['8 ', water, water, water, water, water, water, water, water, water, water],
+    ['9 ', water, water, water, water, water, water, water, water, water, water],
+    ['10', water, water, water, water, water, water, water, water, water, water]
     ]
 player1_board = copy.deepcopy(base_matrix)
 player2_board = copy.deepcopy(base_matrix)
 player1_game = copy.deepcopy(base_matrix)
 player2_game = copy.deepcopy(base_matrix)
-list_of_ships = [1]
+list_of_ships = []
 counter1 = 0
 counter2 = 0
+
+def hit_sound():
+    os.system("aplay explosion.wav")
+
+
+def miss_sound():
+    os.system("aplay splash.wav")
+
+
+def set_sound():
+    os.system("aplay horn.wav")
+
 
 
 def cls():
@@ -38,7 +70,7 @@ def check_columns(matrix, size, position, lines, cols):
     try:
         repeat = 0
         for x in range(0, size):
-            if matrix[(lines + x)][(cols)] == ' 0 ':
+            if matrix[(lines + x)][(cols)] == ship:
                 repeat = 1
                 print('Your ship will cross with another one put it elsewhere')
             else:
@@ -54,7 +86,7 @@ def check_rows(matrix, size, position, lines, cols):
     try:
         repeat = 0
         for x in range(0, size):
-            if matrix[lines][(cols + x)] == ' 0 ':
+            if matrix[lines][(cols + x)] == ship:
                 repeat = 1
                 print('Your ship will cross with another one put it elsewhere')
             else:
@@ -69,10 +101,12 @@ def check_rows(matrix, size, position, lines, cols):
 def print_ship(matrix, size, dir, lines, cols):
     if dir == 'row':
         for x in range(0, size):
-            matrix[lines][(cols + x)] = ' 0 '
+            matrix[lines][(cols + x)] = ship
     elif dir == 'col':
         for x in range(0, size):
-            matrix[(lines + x)][(cols)] = ' 0 '
+            matrix[(lines + x)][(cols)] = ship
+    
+
 
 
 def set_ship_direction(size):
@@ -110,7 +144,7 @@ def check_col_row(matrix, size, position, lines, cols, dir):
     return repeat
 
 
-def ship(size,matrix):
+def ship_set(size,matrix):
     print_board_for_ship_set(size, matrix)
     dir = set_ship_direction(size)
     repeat = 1
@@ -134,17 +168,17 @@ def Title(playernumber):
 def player_set(list_of_ships, matrix, playernumber):
     for elem in list_of_ships:
         Title(playernumber)
-        ship(elem, matrix)
+        ship_set(elem, matrix)
+        set_sound()
         cls()
     return matrix
 
 
 def doubleboard():
-    print('            PLAYER 1' +
-          '                                                            ' + 'PLAYER 2', '\n', '\n', '\n')
-    for i in range(0, 11):
-        print(
-            ''.join(player1_game[i]) + '                                    ' + ''.join(player2_game[i]))
+    print('            PLAYER 1' +'                                                            ' + 'PLAYER 2', '\n', '\n', '\n')
+    print(''.join(player1_game[0]) + '                                    ' + ''.join(player2_game[0]))
+    for i in range(1, 11):
+        print(player1_game[i][0]+''+WATER+''.join(player1_game[i][1:])+END+ '                                    ' + player2_game[i][0]+''+WATER+''.join(player2_game[i][1:])+END)
 
 
 def fight_for_2(player1_board, player2_board, player1_game, player2_game, list_of_ships, columns):
@@ -167,9 +201,10 @@ def fight_for_2(player1_board, player2_board, player1_game, player2_game, list_o
                 try:
                     lines = int(position[1:])
                     cols = (columns.index(position[0]) + 1)
-                    if player2_board[lines][cols] == ' 0 ':
-                        player2_board[lines][cols] = ' X '
-                        player1_game[lines][cols] = ' X '
+                    if player2_board[lines][cols] == ship:
+                        hit_sound()
+                        player2_board[lines][cols] = hit
+                        player1_game[lines][cols] = hit
                         repeat = 1
                         counter1 += 1
                         player = 2
@@ -180,9 +215,10 @@ def fight_for_2(player1_board, player2_board, player1_game, player2_game, list_o
                         else:
                             cls()
                             doubleboard()
-                    elif player2_board[lines][cols] == ' ~ ':
-                        player2_board[lines][cols] = ' * '
-                        player1_game[lines][cols] = ' * '
+                    elif player2_board[lines][cols] == water:
+                        miss_sound()
+                        player2_board[lines][cols] = miss
+                        player1_game[lines][cols] = miss
                         repeat = 1
                         player = 2
                         cls()
@@ -209,9 +245,9 @@ def fight_for_2(player1_board, player2_board, player1_game, player2_game, list_o
                 try:
                     lines = int(position[1:])
                     cols = (columns.index(position[0]) + 1)
-                    if player1_board[lines][cols] == ' 0 ':
-                        player1_board[lines][cols] = ' X '
-                        player2_game[lines][cols] = ' X '
+                    if player1_board[lines][cols] == ship:
+                        player1_board[lines][cols] = hit
+                        player2_game[lines][cols] = hit
                         repeat = 1
                         counter2 += 1
                         player = 1
@@ -222,9 +258,9 @@ def fight_for_2(player1_board, player2_board, player1_game, player2_game, list_o
                         else:
                             cls()
                             doubleboard()
-                    elif player1_board[lines][cols] == ' ~ ':
-                        player1_board[lines][cols] = ' * '
-                        player2_game[lines][cols] = ' * '
+                    elif player1_board[lines][cols] == water:
+                        player1_board[lines][cols] = miss
+                        player2_game[lines][cols] = miss
                         repeat = 1
                         player = 1
                         cls()
@@ -246,12 +282,12 @@ def fight_for_2(player1_board, player2_board, player1_game, player2_game, list_o
     return winner
 
 
-def game_for_2(player1_board, player2_board, player1_game, player2_game, list_of_ships, columns):
+def game_for_2(player1_board, player2_board, player1_game, player2_game, list_of_ships, columns,):
     cls()
     player1_board = player_set(list_of_ships, player1_board, 1)
     player2_board = player_set(list_of_ships, player2_board, 2)
     winner = fight_for_2(player1_board, player2_board, player1_game, player2_game, list_of_ships, columns)
-    print('The winner is: player ' + str(winner))
+    print('The winner is: player ' + str(winner),'\n','\n')
     end = input('Press enter to go to main menu')
     menu(player1_board, player2_board, player1_game, player2_game, list_of_ships, columns)
 
@@ -263,7 +299,7 @@ def legend():
     print('X  hit')
     print('*  miss')
     end = input('Press enter to go to main menu')
-    menu()
+    menu(player1_board, player2_board, player1_game, player2_game, list_of_ships, columns)
 
 
 def menu(player1_board, player2_board, player1_game, player2_game, list_of_ships, columns):
@@ -284,9 +320,29 @@ def menu(player1_board, player2_board, player1_game, player2_game, list_of_ships
         if not (do_in_menu == '1' or do_in_menu == '2'):
             print('This option is not available')
         if (do_in_menu == '1'):
+            list_of_ships=level(list_of_ships)
             game_for_2(player1_board, player2_board, player1_game, player2_game, list_of_ships, columns)
         if (do_in_menu == '2'):
             legend()
-           
+def level (list_of_ships):
+    repeat=1
+    while repeat:
+        cls()
+        lvl=str(input('Chose type of game:'+'\n'+'\n'+'1.Short'+'\n'+'\n'+'2.Middle'+'\n'+'\n'+'3.Full'+'\n'))
+        if lvl=='1':
+            list_of_ships=[3, 2, 1]
+            repeat=0
+            return list_of_ships
+        elif lvl=='2':
+            list_of_ships=[4, 3, 2, 2, 1, 1]   
+            repeat=0
+            return list_of_ships
+        elif lvl=='3':
+            list_of_ships=[4, 3, 3, 2, 2, 2, 1, 1, 1, 1]
+            repeat=0
+            return list_of_ships
+        else:
+            repeat=1    
 cls()
 menu(player1_board, player2_board, player1_game, player2_game, list_of_ships, columns)
+
